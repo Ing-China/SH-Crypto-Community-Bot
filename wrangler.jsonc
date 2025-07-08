@@ -2,18 +2,24 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sh-crypto-community-bot",
   "main": "src/index.ts",
-  "compatibility_date": "2025-07-05"
+  "compatibility_date": "2025-07-05",
+  "vars": {
+    "FACEBOOK_ACCESS_TOKEN": "EAAKqdKdeKtoBPI27QgeKJiEnwYj7M1hvkwoKJrvPk9OZCPo7u5UV2FcQ6sx6vWESZBMZBBH822b7Bg3y73uzHmtsSEEE7OXAt3omzcxGCNd2nhFYMjgKqYhNNE9bkAxfR0ioDosIpfGEGaKNWKw58KNWl7hiVu9hZCKbGCHeGSPZCHvdz7X5mNeTV1pWZCJYIbZCfXGPD9hugEAegirZA0UphbKLkR7s5RNogJjuHlIDFgUQUqtKLaVfifpqHVvA",
+    "FACEBOOK_PAGE_ID": "2817162294965906"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SOCIAL_CACHE",
+      "id": "d3bba9630ff84979af6a4a1a7f9894ff"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/10 * * * *"
+    ]
+  }
   // "compatibility_flags": [
   //   "nodejs_compat"
-  // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "MY_KV_NAMESPACE",
-  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
   // ],
   // "r2_buckets": [
   //   {
