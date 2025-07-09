@@ -5,6 +5,8 @@ export interface TelegramGroupData {
   name: string;
   title: string;
   memberCount: number;
+  subscriberCount?: number; // For channels
+  type: 'group' | 'supergroup' | 'channel';
   lastUpdated: string;
 }
 
@@ -58,20 +60,41 @@ export class TelegramService {
       }
       
       const chat = data.result;
+      const chatType = chat.type;
       
-      // Get member count
-      const memberResponse = await fetch(
-        `https://api.telegram.org/bot${this.botToken}/getChatMemberCount?chat_id=${groupId}`
-      );
+      // Get member/subscriber count based on chat type
+      let memberCount = 0;
+      let subscriberCount = 0;
       
-      const memberData = await memberResponse.json();
-      const memberCount = memberData.ok ? memberData.result : 0;
+      if (chatType === 'channel') {
+        // For channels, try to get subscriber count
+        const memberResponse = await fetch(
+          `https://api.telegram.org/bot${this.botToken}/getChatMemberCount?chat_id=${groupId}`
+        );
+        
+        const memberData = await memberResponse.json();
+        if (memberData.ok) {
+          subscriberCount = memberData.result;
+        }
+      } else {
+        // For groups and supergroups, get member count
+        const memberResponse = await fetch(
+          `https://api.telegram.org/bot${this.botToken}/getChatMemberCount?chat_id=${groupId}`
+        );
+        
+        const memberData = await memberResponse.json();
+        if (memberData.ok) {
+          memberCount = memberData.result;
+        }
+      }
       
       return {
         id: groupId,
         name: this.getGroupNameById(groupId),
         title: chat.title,
         memberCount,
+        subscriberCount: chatType === 'channel' ? subscriberCount : undefined,
+        type: chatType as 'group' | 'supergroup' | 'channel',
         lastUpdated: new Date().toISOString()
       };
     } catch (error) {
@@ -186,13 +209,15 @@ export class TelegramService {
       for (const group of groups) {
         if (group) {
           await db.prepare(`
-            INSERT OR REPLACE INTO group_info (group_id, group_name, title, member_count, last_updated)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO group_info (group_id, group_name, title, member_count, subscriber_count, type, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
           `).bind(
             group.id,
             group.name,
             group.title,
             group.memberCount,
+            group.subscriberCount || null,
+            group.type,
             group.lastUpdated
           ).run();
         }
@@ -228,15 +253,18 @@ export class TelegramService {
       const yesterdayResult = await db.prepare(yesterdayQuery).bind(yesterdayStr).all();
       const yesterdayCounts = yesterdayResult.results as { member_count: number; group_name: string }[];
 
-      // Calculate new joins
-      const getNewJoins = (groupName: string, currentCount: number): number => {
+      // Calculate new joins/subscribers
+      const getNewJoins = (groupName: string, group: TelegramGroupData | null): number => {
+        if (!group) return 0;
+        
+        const currentCount = group.type === 'channel' ? (group.subscriberCount || 0) : group.memberCount;
         const yesterday = yesterdayCounts.find(y => y.group_name === groupName);
         return yesterday ? Math.max(0, currentCount - yesterday.member_count) : 0;
       };
 
-      const shNewsJoins = getNewJoins("shNews", groups[0]?.memberCount || 0);
-      const shCommunityJoins = getNewJoins("shCommunity", groups[1]?.memberCount || 0);
-      const shCryptoLessonJoins = getNewJoins("shCryptoLesson", groups[2]?.memberCount || 0);
+      const shNewsJoins = getNewJoins("shNews", groups[0]);
+      const shCommunityJoins = getNewJoins("shCommunity", groups[1]);
+      const shCryptoLessonJoins = getNewJoins("shCryptoLesson", groups[2]);
 
       // Store daily joins
       await db.prepare(`
