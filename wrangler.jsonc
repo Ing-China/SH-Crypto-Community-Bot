@@ -4,20 +4,31 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-07-05",
   "vars": {
-    "FACEBOOK_ACCESS_TOKEN": "EAAKqdKdeKtoBPI27QgeKJiEnwYj7M1hvkwoKJrvPk9OZCPo7u5UV2FcQ6sx6vWESZBMZBBH822b7Bg3y73uzHmtsSEEE7OXAt3omzcxGCNd2nhFYMjgKqYhNNE9bkAxfR0ioDosIpfGEGaKNWKw58KNWl7hiVu9hZCKbGCHeGSPZCHvdz7X5mNeTV1pWZCJYIbZCfXGPD9hugEAegirZA0UphbKLkR7s5RNogJjuHlIDFgUQUqtKLaVfifpqHVvA",
-    "FACEBOOK_PAGE_ID": "2817162294965906"
+    "FACEBOOK_ACCESS_TOKEN": "YOUR_FACEBOOK_ACCESS_TOKEN",
+    "FACEBOOK_PAGE_ID": "YOUR_FACEBOOK_PAGE_ID",
+    "TELEGRAM_BOT_TOKEN": "YOUR_TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_SH_NEWS_GROUP_ID": "YOUR_SH_NEWS_GROUP_ID",
+    "TELEGRAM_SH_COMMUNITY_GROUP_ID": "YOUR_SH_COMMUNITY_GROUP_ID",
+    "TELEGRAM_SH_CRYPTO_LESSON_GROUP_ID": "YOUR_SH_CRYPTO_LESSON_GROUP_ID"
   },
   "kv_namespaces": [
     {
       "binding": "SOCIAL_CACHE",
-      "id": "d3bba9630ff84979af6a4a1a7f9894ff"
+      "id": "YOUR_KV_NAMESPACE_ID"
     }
   ],
   "triggers": {
     "crons": [
       "*/10 * * * *"
     ]
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "TELEGRAM_DB",
+      "database_name": "sh-crypto-telegram-db",
+      "database_id": "YOUR_D1_DATABASE_ID"
+    }
+  ]
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -25,13 +36,6 @@
   //   {
   //     "binding": "MY_BUCKET",
   //     "bucket_name": "my-bucket"
-  //   }
-  // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
   //   }
   // ],
   // "ai": {
